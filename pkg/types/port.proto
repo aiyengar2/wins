@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package wins;
+
+option go_package = "types";
+
+message Port {
+    int32 Port = 1;
+    Protocol Protocol = 2;
+}
+
+enum Protocol {
+    TCP = 0;
+    UDP = 1;
+}

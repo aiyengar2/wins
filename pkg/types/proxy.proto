@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package wins;
+
+import "port.proto";
+
+option go_package = "types";
+
+service ProxyService {
+    rpc Publish(ProxyPublishRequest) returns (ProxyPublishResponse) {
+    }
+}
+
+message ProxyPublishRequest {
+    repeated Port Ports = 1;
+}
+
+message ProxyPublishResponse {
+    bool Success = 1;
+}

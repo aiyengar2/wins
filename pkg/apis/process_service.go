@@ -55,7 +55,7 @@ func renameBinary(srcPath string) string {
 	return filepath.Join(filepath.Dir(srcPath), processPrefix+filepath.Base(srcPath))
 }
 
-func toFirewallRules(exposes []*types.ProcessExpose) string {
+func toFirewallRules(exposes []*types.Port) string {
 	exposePair := make([]string, 0, len(exposes))
 
 	for _, expose := range exposes {

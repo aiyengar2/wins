@@ -31,6 +31,7 @@ func (s *Server) Serve(ctx context.Context) error {
 	types.RegisterRouteServiceServer(srv, &routeService{})
 	types.RegisterProcessServiceServer(srv, &processService{})
 	types.RegisterApplicationServiceServer(srv, &applicationService{})
+	types.RegisterProxyServiceServer(srv, &proxyService{})
 
 	logrus.Infof("Listening on %v", s.listener.Addr())
 
