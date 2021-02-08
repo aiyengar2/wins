@@ -13,6 +13,7 @@ import (
 
 type Server struct {
 	listener net.Listener
+	proxy    net.Listener
 	server   *grpc.Server
 }
 
@@ -24,6 +25,14 @@ func (s *Server) Close() error {
 func (s *Server) Serve(ctx context.Context) error {
 	srv := s.server
 
+	// Initialize proxy
+	ps, err := initProxyService(ctx)
+	if err != nil {
+		return err
+	}
+	s.proxy = ps.proxy
+	logrus.Infof("Listening on %v", ps.proxy.Addr())
+
 	// register service
 	types.RegisterHostServiceServer(srv, &hostService{})
 	types.RegisterNetworkServiceServer(srv, &networkService{})
@@ -31,6 +40,7 @@ func (s *Server) Serve(ctx context.Context) error {
 	types.RegisterRouteServiceServer(srv, &routeService{})
 	types.RegisterProcessServiceServer(srv, &processService{})
 	types.RegisterApplicationServiceServer(srv, &applicationService{})
+	types.RegisterProxyServiceServer(srv, ps)
 
 	logrus.Infof("Listening on %v", s.listener.Addr())
 

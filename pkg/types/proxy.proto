@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package wins;
+
+import "common.proto";
+import "port.proto";
+
+option go_package = "types";
+
+service ProxyService {
+    rpc KeepAlive(stream ProxyKeepAliveRequest) returns (Void) {
+    }
+}
+
+message ProxyKeepAliveRequest {
+    string ID = 1;
+    repeated Port Ports = 2;
+}

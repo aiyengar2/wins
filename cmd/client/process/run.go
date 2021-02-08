@@ -65,7 +65,7 @@ func _runRequestParser(cliCtx *cli.Context) (err error) {
 	if err != nil {
 		return errors.Wrapf(err, "failed to get checksum for --path %s", path)
 	}
-	var exposes []*types.ProcessExpose
+	var exposes []*types.Port
 	if exposesList := flags.GetListValue(cliCtx, "exposes"); !exposesList.IsEmpty() {
 		exposes, err = parseExposes(exposesList.Get())
 		if err != nil {
@@ -92,8 +92,8 @@ func _runRequestParser(cliCtx *cli.Context) (err error) {
 	return nil
 }
 
-func parseExposes(exposes []string) ([]*types.ProcessExpose, error) {
-	var runExposes []*types.ProcessExpose
+func parseExposes(exposes []string) ([]*types.Port, error) {
+	var runExposes []*types.Port
 	for _, exp := range exposes {
 		exposes := strings.SplitN(exp, ":", 2)
 		if len(exposes) != 2 {
@@ -103,14 +103,14 @@ func parseExposes(exposes []string) ([]*types.ProcessExpose, error) {
 		protocol := exposes[0]
 		portRanges := strings.SplitN(exposes[1], "-", 2)
 		if len(portRanges) == 1 {
-			number, err := strconv.Atoi(portRanges[0])
+			number, err := strconv.ParseUint(portRanges[0], 10, 16)
 			if err != nil {
 				return nil, errors.Wrapf(err, "could not parse port %s from expose %s", portRanges[0], exp)
 			}
 
-			runExposes = append(runExposes, &types.ProcessExpose{
-				Protocol: types.RunExposeProtocol(types.RunExposeProtocol_value[protocol]),
-				Port:     int32(number),
+			runExposes = append(runExposes, &types.Port{
+				Protocol: types.Protocol(types.Protocol_value[protocol]),
+				Port:     uint32(number),
 			})
 		} else if len(portRanges) == 2 {
 			low, err := strconv.Atoi(portRanges[0])
@@ -126,9 +126,12 @@ func parseExposes(exposes []string) ([]*types.ProcessExpose, error) {
 			}
 
 			for number := low; number <= hig; number++ {
-				runExposes = append(runExposes, &types.ProcessExpose{
-					Protocol: types.RunExposeProtocol(types.RunExposeProtocol_value[protocol]),
-					Port:     int32(number),
+				if number > 0xFF {
+					return nil, errors.Errorf("invalid port number: %d", number)
+				}
+				runExposes = append(runExposes, &types.Port{
+					Protocol: types.Protocol(types.Protocol_value[protocol]),
+					Port:     uint32(number),
 				})
 			}
 		} else {

@@ -3,6 +3,7 @@ syntax = "proto3";
 package wins;
 
 import "common.proto";
+import "port.proto";
 
 option go_package = "types";
 
@@ -19,7 +20,7 @@ message ProcessStartRequest {
     string Checksum = 1;
     string Path = 2;
     repeated string Args = 3;
-    repeated ProcessExpose Exposes = 4;
+    repeated Port Exposes = 4;
     repeated string Envs = 5;
     string Dir = 6;
 }
@@ -41,16 +42,6 @@ message ProcessWaitResponse {
 
 message ProcessKeepAliveRequest {
     ProcessName Data = 1;
-}
-
-enum RunExposeProtocol {
-    TCP = 0;
-    UDP = 1;
-}
-
-message ProcessExpose {
-    int32 Port = 1;
-    RunExposeProtocol Protocol = 2;
 }
 
 message ProcessName {
